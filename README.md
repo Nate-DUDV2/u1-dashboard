@@ -24,11 +24,14 @@ You do not need to install anything to run this dashboard.
 4. **Linux:** Right-click the executable, check "Allow executing file as program", and run it.
 5. **macOS:** Due to Apple's Gatekeeper, you may need to right-click the app and select "Open" the first time, or allow it via *System Settings > Privacy & Security*.
 
-## 🛠️ Development Setup
-If you want to build this application from source:
+## 🏠 Home Assistant Integration (Full-Screen Control Panel)
 
-1. **Install Node.js** (v18 or newer).
-2. Clone this repository.
-3. Install dependencies:
-   ```bash
-   npm install
+You can run this custom dashboard natively inside Home Assistant as a blazing-fast, full-screen control center. 
+
+### Step 1: Copy the Web Files to Home Assistant
+The compiled web files live in the `/dist` folder of this repository. You need to place them into your Home Assistant `www` directory.
+
+* **Option A: Via SSH/Terminal (Easiest for Linux/Docker/Ubuntu)**
+  SSH into your Home Assistant server and run this single command to pull the files directly into the right place:
+  ```bash
+  git clone [https://github.com/Nate-DUDV2/u1-dashboard.git](https://github.com/Nate-DUDV2/u1-dashboard.git) /tmp/u1-dashboard && mv /tmp/u1-dashboard/dist /config/www/nates-dashboard && rm -rf /tmp/u1-dashboard
