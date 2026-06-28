@@ -1,0 +1,27 @@
+{
+  "name": "u1-dashboard",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "main": "main.cjs",
+  "author": "Nates Print Shop",
+  "description": "Snapmaker U1 Dashboard Control Panel",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "electron:start": "electron .",
+    "make": "npx vite build && npx electron-packager . \"Snapmaker U1 Dashboard\" --platform=win32,darwin,linux --arch=x64 --out=dist-desktop --overwrite --electron-version=30.0.0"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.1",
+    "electron": "^30.0.0",
+    "electron-packager": "^17.1.2",
+    "vite": "^5.4.1"
+  }
+}
