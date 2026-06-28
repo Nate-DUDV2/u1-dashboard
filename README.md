@@ -2,6 +2,10 @@
 
 A standalone, cross-platform desktop control panel designed specifically for Snapmaker U1 3D Printers. Originally built for **Nates Print Shop**, this dashboard provides a clean, unified interface to monitor and control multi-color prints without needing a browser.
 
+### ⚠️ IMPORTANT REQUIREMENT
+**This dashboard requires your printer to be running the Extended Firmware.** Before using this app, you must install the custom firmware found here: 
+👉 [SnapmakerU1-Extended-Firmware by paxx12](https://github.com/paxx12-snapmaker-u1/SnapmakerU1-Extended-Firmware)
+
 ## ✨ Features
 * **Live Video Feed:** Real-time monitoring of your print bed.
 * **Multi-OS Support:** Runs natively as a desktop app on Windows, macOS, and Linux.
@@ -24,7 +28,7 @@ You do not need to install anything to run this dashboard.
 If you want to build this application from source:
 
 1. **Install Node.js** (v18 or newer).
-2. Clone this repository
+2. Clone this repository.
 3. Install dependencies:
    ```bash
    npm install
