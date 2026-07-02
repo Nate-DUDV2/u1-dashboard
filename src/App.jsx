@@ -441,7 +441,7 @@ function App() {
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #333', paddingBottom: '15px', marginBottom: '20px' }}>
             <h1 style={{ margin: 0, fontSize: '24px' }}>Printer Control Panel</h1>
             <div style={{ display: 'flex', gap: '5px' }}>
-              {['Control', 'Toolheads', 'Movement', 'Terminal', 'History', 'Fluidd'].map(tab => (
+              {['Control', 'Toolheads', 'Movement', 'Terminal', 'History', 'Fluidd', 'Firmware Config'].map(tab => (
                 <button key={tab} onClick={() => setCpTab(tab)} style={{ padding: '10px 20px', backgroundColor: cpTab === tab ? '#2A3B5C' : 'transparent', border: 'none', borderBottom: cpTab === tab ? '2px solid #00E5FF' : '2px solid transparent', color: cpTab === tab ? '#fff' : '#888', fontWeight: 'bold', cursor: 'pointer' }}>
                   {tab}
                 </button>
@@ -612,6 +612,13 @@ function App() {
             {cpTab === 'Fluidd' && (
               <div style={{ width: '100%', height: '100%', backgroundColor: '#000', borderRadius: '8px', overflow: 'hidden' }}>
                 <iframe src={`http://${printerIp}/`} title="Fluidd Web Page" style={{ width: '100%', height: '100%', border: 'none' }} />
+              </div>
+            )}
+
+            {/* ⚙️ FIRMWARE CONFIG TAB */}
+            {cpTab === 'Firmware Config' && (
+              <div style={{ width: '100%', height: '100%', backgroundColor: '#000', borderRadius: '8px', overflow: 'hidden' }}>
+                <iframe src={`http://${printerIp}/firmware-config/`} title="Firmware Config Web Page" style={{ width: '100%', height: '100%', border: 'none' }} />
               </div>
             )}
 

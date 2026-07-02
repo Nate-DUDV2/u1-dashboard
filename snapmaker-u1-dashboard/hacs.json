@@ -1,0 +1,6 @@
+{
+    "name": "Snapmaker U1 Dashboard",
+    "render_readme": true,
+    "type": "plugin",
+    "filename": "snapmaker-card.js"
+  }
