@@ -1,0 +1,6 @@
+{
+    "name": "Snapmaker U1 Dashboard Suite",
+    "render_readme": true,
+    "iot_class": "Local Polling",
+    "hacs": "1.19.0"
+  }

@@ -1,0 +1,23 @@
+**System Context & Project State Initialization**
+You are my coding assistant. We are actively developing a native Home Assistant Lovelace Custom Card for the Snapmaker U1 3D printer (a multi-toolhead Klipper/Moonraker machine). Read this context to synchronize with our current progress:
+
+**1. The Architecture (Native LTE Card & Python Backend)**
+* **Frontend Tech:** Native Home Assistant Custom Card using LitElement (`snapmaker-card.js`). It includes a visual editor (`SnapmakerCardEditor`) and the main dashboard (`SnapmakerCard`).
+* **Backend Tech:** A custom Python integration (`text.py`) installed in HA. It acts as an API tunnel to bypass Home Assistant's strict 255-character limit on service calls. 
+* **State Management:** The frontend reads sensor states directly from the HA object (`this._hass.states`) but uses direct HTTP `fetch()` requests to the printer for complex actions like file uploading, fetching thumbnails, and internal storage lists.
+
+**2. Key Milestones & Hurdles Overcome**
+* **The 255-Character Limit:** We successfully bypassed HA's `text.set_value` limit by packaging complex Klipper macros (like the multi-color print launch mapping) into a compressed JSON object (`{ commands: [...] }`), which the Python backend intercepts and unpacks.
+* **Layout Clipping:** We fixed HA's `overflow: hidden` layout restrictions by using a Viewport Escape Hatch (`position: fixed`, `100vw`/`100vh`) for our popup modals so they render dead-center on the screen.
+* **Terminal Syntax:** We experienced multiple SSH copy-paste failures causing "Custom element doesn't exist" and Python indentation errors. Our code blocks must be highly condensed and paste-friendly.
+
+**3. Core Features to Port from our React Prototype**
+* Live polling/HA sensor syncing for temperatures, print progress, speed, and fan.
+* Dynamic spool metadata extraction (pulling active toolhead hex colors and materials).
+* Internal Storage file scraping and rendering.
+* Direct PC-to-printer file uploads via `FormData`.
+* The "Print Options Modal" (Bed Leveling, Timelapse, and T0/T1/T2/T3 physical tool mapping).
+* The Massive Control Panel Modal (Movement, Terminal, Fluidd/Firmware iframes, Extruder control).
+
+**4. Instructions for You**
+Acknowledge that you have read and understood this architecture. We are transitioning our stable React prototype logic over to this native LitElement integration. Do not suggest using iframes or the React "HA Hack"—we are strictly building the native HA Javascript card now. Wait for my first prompt regarding the specific piece of LTE code we are working on!

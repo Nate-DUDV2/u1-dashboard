@@ -1,0 +1,9 @@
+{
+  "domain": "snapmaker_u1",
+  "name": "Snapmaker U1 by Nate's Print Shop",
+  "codeowners": ["@NatesPrintShop"],
+  "dependencies": [],
+  "iot_class": "local_polling",
+  "version": "1.0.0",
+  "config_flow": true
+}
