@@ -18,6 +18,7 @@ function App() {
   const [filename, setFilename] = useState('');
   const [thumbnailUrl, setThumbnailUrl] = useState('');
   const [isCameraActive, setIsCameraActive] = useState(false);
+  const [cameraType, setCameraType] = useState('case'); // 'case' or 'usb'
 
   // --- BOTTOM DASHBOARD STATES ---
   const [spools, setSpools] = useState([{ vendor: '', type: '', color: 'FFFFFF' }, { vendor: '', type: '', color: 'FFFFFF' }, { vendor: '', type: '', color: 'FFFFFF' }, { vendor: '', type: '', color: 'FFFFFF' }]);
@@ -310,13 +311,39 @@ function App() {
             <span style={{ fontSize: '11px', color: '#888' }}>/{Number(bedTemp.target).toFixed(0)}°C</span>
           </div>
         </div>
-        <div onClick={() => setIsCameraActive(!isCameraActive)} style={{ flex: 1, backgroundColor: '#161B22', borderRadius: '8px', border: '1px solid #333', display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer', overflow: 'hidden' }}>
-          {isCameraActive ? <img src={`http://${printerIp}/webcam/stream.mjpg`} style={{ width: '100%', height: '100%', objectFit: 'contain' }} onError={(e) => { setTimeout(() => { e.target.src = `http://${printerIp}/webcam/stream.mjpg?${Date.now()}`; }, 2000); }}/> : thumbnailUrl ? <img src={thumbnailUrl} style={{ width: '100%', height: '100%', objectFit: 'contain' }} /> : <p style={{ color: '#555' }}>No Print Active / Click for Camera</p>}
+        
+        {/* CAMERA FEED - UPDATED FOR DUAL CAMERA TOGGLE */}
+        <div style={{ flex: 1, backgroundColor: '#161B22', borderRadius: '8px', border: '1px solid #333', display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'hidden', position: 'relative' }}>
+          {isCameraActive ? (
+            <img 
+              src={cameraType === 'case' ? `http://${printerIp}/webcam/stream.mjpg` : `http://${printerIp}/webcam2/stream.mjpg`} 
+              style={{ width: '100%', height: '100%', objectFit: 'contain', cursor: 'pointer' }} 
+              onError={(e) => { setTimeout(() => { e.target.src = e.target.src.split('?')[0] + `?${Date.now()}`; }, 2000); }}
+              onClick={() => setIsCameraActive(false)}
+            />
+          ) : thumbnailUrl ? (
+            <img src={thumbnailUrl} style={{ width: '100%', height: '100%', objectFit: 'contain', cursor: 'pointer' }} onClick={() => setIsCameraActive(true)} />
+          ) : (
+            <p style={{ color: '#555', cursor: 'pointer' }} onClick={() => setIsCameraActive(true)}>No Print Active / Click for Camera</p>
+          )}
         </div>
+
+        {/* STATS & RADIO BUTTONS */}
         <div style={{ width: '100px', display: 'flex', flexDirection: 'column', gap: '20px', alignItems: 'flex-end', textAlign: 'right' }}>
           <div style={{ display: 'flex', flexDirection: 'column' }}><span style={{ fontSize: '11px', color: '#888', fontWeight: 'bold', letterSpacing: '1px' }}>LAYER</span><span style={{ fontSize: '24px', fontWeight: 'bold' }}>{printStats.layer}</span><span style={{ fontSize: '11px', color: '#888' }}>/{printStats.totalLayers > 0 ? printStats.totalLayers : '-'}</span></div>
           <div style={{ display: 'flex', flexDirection: 'column' }}><span style={{ fontSize: '11px', color: '#888', fontWeight: 'bold', letterSpacing: '1px' }}>SPEED</span><span style={{ fontSize: '24px', fontWeight: 'bold' }}>{Number(printStats.speed).toFixed(0)}</span><span style={{ fontSize: '11px', color: '#888' }}>%</span></div>
           <div style={{ display: 'flex', flexDirection: 'column' }}><span style={{ fontSize: '11px', color: '#888', fontWeight: 'bold', letterSpacing: '1px' }}>FAN</span><span style={{ fontSize: '24px', fontWeight: 'bold' }}>{Number(printStats.fan).toFixed(0)}</span><span style={{ fontSize: '11px', color: '#888' }}>%</span></div>
+          
+          {/* CAMERA TOGGLE RADIO BUTTONS (SPACED OUT) */}
+          <div style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '10px' }}>
+            <span style={{ fontSize: '11px', color: '#888', fontWeight: 'bold', letterSpacing: '1px' }}>CAMERA</span>
+            <label style={{ fontSize: '13px', color: cameraType === 'case' ? '#00E5FF' : '#aaa', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              CASE <input type="radio" name="camType" checked={cameraType === 'case'} onChange={() => setCameraType('case')} style={{ cursor: 'pointer' }}/>
+            </label>
+            <label style={{ fontSize: '13px', color: cameraType === 'usb' ? '#00E5FF' : '#aaa', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              USB <input type="radio" name="camType" checked={cameraType === 'usb'} onChange={() => setCameraType('usb')} style={{ cursor: 'pointer' }}/>
+            </label>
+          </div>
         </div>
       </div>
 

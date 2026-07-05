@@ -6,19 +6,23 @@
   "main": "main.cjs",
   "author": "Nates Print Shop",
   "description": "Snapmaker U1 Dashboard Control Panel",
+  "homepage": "https://Nate-DUDV2.github.io/u1-dashboard",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "electron:start": "electron .",
-    "make": "npx vite build && npx electron-packager . \"Snapmaker U1 Dashboard\" --platform=win32,darwin,linux --arch=x64 --out=dist-desktop --overwrite --electron-version=30.0.0"
+    "make": "vite build && electron-packager . \"Snapmaker U1 Dashboard\" --platform=win32,darwin,linux --arch=x64,arm64 --out=dist-desktop --overwrite --electron-version=30.0.0",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "gh-pages": "^6.3.0",
     "@vitejs/plugin-react": "^4.3.1",
     "electron": "^30.0.0",
     "electron-packager": "^17.1.2",
