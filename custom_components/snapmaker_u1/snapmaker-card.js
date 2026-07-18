@@ -557,7 +557,7 @@ class SnapmakerControlCard extends SnapmakerBaseCard {
   static get styles() {
     return css`
       ha-card { padding: 16px; position: relative; }
-      .tabs { display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 1px solid var(--divider-color); padding-bottom: 8px; }
+      .tabs { display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 1px solid var(--divider-color); padding-bottom: 8px; flex-wrap: wrap; }
       .tab { background: none; border: none; color: var(--secondary-text-color); font-size: 14px; font-weight: bold; cursor: pointer; padding: 6px 12px; border-radius: 4px; transition: 0.2s; }
       .tab.active { background: var(--secondary-background-color); color: var(--primary-text-color); }
       .tab:hover:not(.active) { color: var(--primary-text-color); }
@@ -618,6 +618,7 @@ class SnapmakerControlCard extends SnapmakerBaseCard {
           <button class="tab ${this._activeTab === 'extrude' ? 'active' : ''}" @click=${() => this._activeTab = 'extrude'}>Extrude</button>
           <button class="tab ${this._activeTab === 'tune' ? 'active' : ''}" @click=${() => this._activeTab = 'tune'}>Tune</button>
           <button class="tab ${this._activeTab === 'terminal' ? 'active' : ''}" @click=${() => { this._activeTab = 'terminal'; if(!isPreview) this._fetchTerminal(); }}>Terminal</button>
+          <button class="tab ${this._activeTab === 'fwconfig' ? 'active' : ''}" @click=${() => this._activeTab = 'fwconfig'}>FW Config</button>
         </div>
 
         ${this._activeTab === 'move' ? html`
@@ -689,6 +690,16 @@ class SnapmakerControlCard extends SnapmakerBaseCard {
             <button class="btn btn-primary" ?disabled=${isPreview} @click=${this._submitTerminal}>Send</button>
           </div>
         ` : ''}
+
+        ${this._activeTab === 'fwconfig' ? html`
+          <div style="height: 280px; width: 100%; border-radius: 6px; overflow: hidden; border: 1px solid var(--divider-color); background: var(--secondary-background-color);">
+            ${isPreview 
+              ? html`<div style="display:flex; height:100%; justify-content:center; align-items:center; color:var(--secondary-text-color);">[Firmware Config Preveiw]</div>`
+              : html`<iframe src="http://${this._getIpFromEntity()}/firmware-config/" style="width: 100%; height: 100%; border: none;"></iframe>`
+            }
+          </div>
+        ` : ''}
+
       </ha-card>
     `;
   }
