@@ -153,9 +153,9 @@ class SnapmakerBaseCard extends LitElement {
 // 1. STATUS CARD
 // ==========================================
 class SnapmakerStatusCard extends SnapmakerBaseCard {
-  static get properties() { return { ...super.properties, _showCamera: { type: Boolean }, _thumbnailUrl: { type: String } }; }
+  static get properties() { return { ...super.properties, _showCamera: { type: Boolean }, _thumbnailUrl: { type: String }, _cameraType: { type: String } }; }
 
-  constructor() { super(); this._showCamera = true; this._thumbnailUrl = null; this._lastFetchedFile = null; }
+  constructor() { super(); this._showCamera = true; this._thumbnailUrl = null; this._lastFetchedFile = null; this._cameraType = 'case'; }
 
   static get styles() {
     return css`
@@ -164,7 +164,6 @@ class SnapmakerStatusCard extends SnapmakerBaseCard {
       .title { font-size: 18px; font-weight: 500; color: var(--primary-text-color); }
       .main-content { display: flex; gap: 16px; min-height: 200px; }
       .camera-feed { flex: 1; background: var(--secondary-background-color); border-radius: 8px; overflow: hidden; display: flex; justify-content: center; align-items: center; cursor: pointer; position: relative; border: 1px solid var(--divider-color); }
-      .camera-feed img { width: 100%; height: 100%; object-fit: contain; }
       .stats-panel { width: 100px; display: flex; flex-direction: column; gap: 12px; background: var(--secondary-background-color); padding: 12px; border-radius: 8px; border: 1px solid var(--divider-color); }
       .stat-item { display: flex; flex-direction: column; }
       .stat-label { font-size: 11px; color: var(--secondary-text-color); display: flex; align-items: center; gap: 4px; }
@@ -178,17 +177,6 @@ class SnapmakerStatusCard extends SnapmakerBaseCard {
       .btn:disabled { opacity: 0.4; cursor: not-allowed; }
       .interactive-stat:hover { opacity: 0.7; cursor: pointer; }
     `;
-  }
-
-  _handleCameraError(e) {
-    if (!this.hass || !this.config || !this.config.entity) return;
-    const ipSafe = this._getIpSafe();
-    const camId = Object.keys(this.hass.states).find(id => id.startsWith('camera.') && id.includes(ipSafe));
-    if (camId && this.hass.states[camId].attributes?.access_token) {
-      const proxyUrl = `/api/camera_proxy_stream/${camId}?token=${this.hass.states[camId].attributes.access_token}`;
-      if (!e.target.src.includes('/api/camera_proxy_stream/')) e.target.src = proxyUrl;
-      else e.target.style.display = 'none';
-    } else e.target.style.display = 'none';
   }
 
   async updated(changedProperties) {
@@ -238,16 +226,19 @@ class SnapmakerStatusCard extends SnapmakerBaseCard {
 
     const currentFileStr = isPreview ? 'Awesome_Vase_Print.gcode' : (this._getState('current_file') !== '—' ? this._getState('current_file') : 'Idle');
 
-    let camUrl = "";
+    let camCaseUrl = "";
+    let camUsbUrl = "";
     if (!isPreview) {
       const ipSafe = this._getIpSafe();
-      const camId = Object.keys(this.hass.states).find(id => id.startsWith('camera.') && id.includes(ipSafe));
       const ip = this._getIpFromEntity();
-      camUrl = `http://${ip}:7125/webcam/stream.mjpg`; 
+      
+      const camId = Object.keys(this.hass.states).find(id => id.startsWith('camera.') && id.includes(ipSafe));
+      camCaseUrl = `http://${ip}:7125/webcam/stream.mjpg`; 
       if (camId) {
         const token = this.hass.states[camId].attributes?.access_token;
-        camUrl = token ? `/api/camera_proxy_stream/${camId}?token=${token}` : `/api/camera_proxy_stream/${camId}`;
+        camCaseUrl = token ? `/api/camera_proxy_stream/${camId}?token=${token}` : `/api/camera_proxy_stream/${camId}`;
       }
+      camUsbUrl = `http://${ip}/webcam2/stream.mjpg`;
     }
 
     return html`
@@ -261,12 +252,18 @@ class SnapmakerStatusCard extends SnapmakerBaseCard {
           <div class="camera-feed" @click=${() => this._showCamera = !this._showCamera}>
             ${isPreview
               ? html`<div style="width:100%; height:100%; display:flex; flex-direction:column; justify-content:center; align-items:center; color:#555;"><ha-icon icon="mdi:printer-3d" style="--mdc-icon-size: 48px; margin-bottom: 8px;"></ha-icon><div>Live View</div></div>`
-              : (this._showCamera 
-                  ? html`<img src="${camUrl}" style="width: 100%; height: 100%; object-fit: contain;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
-                         <p style="color: #555; display: none;">Camera Feed Unavailable</p>`
-                  : html`<img src="${this._thumbnailUrl || ''}" style="width: 100%; height: 100%; object-fit: contain;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
-                         <p style="color: #555; display: ${this._thumbnailUrl ? 'none' : 'block'};">No Thumbnail Available</p>`
-                )
+              : html`
+                  <!-- Strictly separated DOM elements to prevent MJPEG bleed over into Thumbnails -->
+                  <img src="${camCaseUrl}" style="width: 100%; height: 100%; object-fit: contain; display: ${this._showCamera && this._cameraType === 'case' ? 'block' : 'none'};" />
+                  <img src="${camUsbUrl}" style="width: 100%; height: 100%; object-fit: contain; display: ${this._showCamera && this._cameraType === 'usb' ? 'block' : 'none'};" />
+                  
+                  <div style="width: 100%; height: 100%; display: ${!this._showCamera ? 'flex' : 'none'}; flex-direction: column; justify-content: center; align-items: center;">
+                    ${this._thumbnailUrl 
+                      ? html`<img src="${this._thumbnailUrl}" style="width: 100%; height: 100%; object-fit: contain;" />` 
+                      : html`<p style="color: #555; margin: 0;">No Thumbnail Available</p>`
+                    }
+                  </div>
+                `
             }
           </div>
           <div class="stats-panel">
@@ -277,6 +274,17 @@ class SnapmakerStatusCard extends SnapmakerBaseCard {
             <div class="stat-item"><span class="stat-label">Layer</span><span class="stat-value">${layer}/${tLayers}</span></div>
             <div class="stat-item"><span class="stat-label">Speed</span><span class="stat-value">${speed}%</span></div>
             <div class="stat-item"><span class="stat-label">Fan</span><span class="stat-value">${fan}%</span></div>
+            
+            <!-- USB / CASE CAMERA TOGGLE -->
+            <div style="margin-top: 16px; display: flex; flex-direction: column; gap: 8px;">
+              <span class="stat-label" style="font-weight: bold; letter-spacing: 1px;">CAMERA</span>
+              <label style="font-size: 11px; color: ${this._cameraType === 'case' ? 'var(--primary-color)' : 'var(--secondary-text-color)'}; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                <input type="radio" name="haCamType" .checked=${this._cameraType === 'case'} @change=${() => this._cameraType = 'case'} style="margin:0; cursor: pointer;"> CASE
+              </label>
+              <label style="font-size: 11px; color: ${this._cameraType === 'usb' ? 'var(--primary-color)' : 'var(--secondary-text-color)'}; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                <input type="radio" name="haCamType" .checked=${this._cameraType === 'usb'} @change=${() => this._cameraType = 'usb'} style="margin:0; cursor: pointer;"> USB
+              </label>
+            </div>
           </div>
         </div>
 
